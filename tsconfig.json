@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",                  // React 17+ JSX 변환 방식
+    "esModuleInterop": true,             // CommonJS interop 허용
+    "allowSyntheticDefaultImports": true // default import 허용
+  }
+}
