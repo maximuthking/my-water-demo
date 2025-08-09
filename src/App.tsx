@@ -1,45 +1,17 @@
 // --- START OF FILE App.tsx ---
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { useControls, Leva, folder } from 'leva';
 import LowPolyWater from './LowPolyWater';
 import './App.css';
-// --- FIX: Separate type imports from value imports ---
-import { useRef } from 'react';
-import type { MutableRefObject } from 'react';
-import { DirectionalLight, Mesh } from 'three';
-
-// This component lives inside the Canvas and can use `useFrame`.
-function SunController({ sunAngle, directionalLightRef, sunMeshRef }: {
-  sunAngle: number;
-  directionalLightRef: MutableRefObject<DirectionalLight>;
-  sunMeshRef: MutableRefObject<Mesh>;
-}) {
-  useFrame(() => {
-    // Calculate sun's position on a circular orbit
-    const orbitRadius = 20;
-    const angleRad = (sunAngle * Math.PI) / 180;
-    const x = orbitRadius * Math.cos(angleRad);
-    const y = orbitRadius * Math.sin(angleRad);
-    const z = 5;
-
-    // Update positions if the refs are attached
-    if (sunMeshRef.current) {
-        sunMeshRef.current.position.set(x, y, z);
-    }
-    if (directionalLightRef.current) {
-        directionalLightRef.current.position.set(x, y, z);
-    }
-  });
-
-  return null;
-}
+// --- FIX: 불필요한 import들을 모두 정리합니다. ---
+// useRef, MutableRefObject, DirectionalLight, Mesh 등은 더 이상 필요 없습니다.
 
 export default function App() {
   const props = useControls({
-    '조명 & 환경': folder({
-      sunAngle: { value: 90, min: 0, max: 180, label: '시간 (각도)' },
+    // --- FIX: '태양' 그룹을 제거하고 '환경 설정'으로 단순화합니다. ---
+    '환경 설정': folder({
       ambientIntensity: { value: 0.3, min: 0, max: 2, label: '주변광 강도'},
     }),
     '파도 & 노이즈': folder({
@@ -65,9 +37,8 @@ export default function App() {
       wireframe: { value: false, label: '와이어프레임' },
     })
   });
-
-  const directionalLightRef = useRef<DirectionalLight>(null!);
-  const sunMeshRef = useRef<Mesh>(null!);
+  
+  // --- FIX: useRef와 SunController 로직을 모두 삭제합니다. ---
 
   return (
     <>
@@ -75,19 +46,12 @@ export default function App() {
       <Canvas camera={{ position: [0, 15, 15], fov: 60 }} onCreated={({ camera }) => camera.lookAt(0, 0, 0)}>
         <ambientLight intensity={props.ambientIntensity} />
         
-        <directionalLight ref={directionalLightRef} intensity={1} />
+        {/* --- FIX: 원래의 고정된 위치를 가진 DirectionalLight로 되돌립니다. --- */}
+        <directionalLight position={[5, 10, 5]} intensity={1} />
         
-        <mesh ref={sunMeshRef}>
-            <sphereGeometry args={[0.7, 32, 32]} />
-            <meshStandardMaterial emissive="yellow" emissiveIntensity={3} color="yellow" />
-            <pointLight color="white" intensity={2} distance={20} />
-        </mesh>
+        {/* --- FIX: 태양 메시(mesh)를 삭제합니다. --- */}
 
-        <SunController 
-          sunAngle={props.sunAngle}
-          directionalLightRef={directionalLightRef}
-          sunMeshRef={sunMeshRef}
-        />
+        {/* --- FIX: SunController 컴포넌트를 삭제합니다. --- */}
 
         <LowPolyWater {...props} wireframeColor="black" />
         <OrbitControls />
